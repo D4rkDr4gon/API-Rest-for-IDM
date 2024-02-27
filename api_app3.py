@@ -10,11 +10,11 @@ usuarios = []
 def obtener_usuarios():
     return jsonify(usuarios)
 
-# Ruta para obtener un usuario específico por su ID
-@app.route('/api/usuarios/<int:id>', methods=['GET'])
-def obtener_usuario(id):
+# Ruta para obtener un usuario específico por su nombre de usuario
+@app.route('/api/usuarios/<string:username>', methods=['GET'])
+def obtener_usuario(username):
     for usuario in usuarios:
-        if usuario['id'] == id:
+        if usuario['username'] == username:
             return jsonify(usuario)
     return jsonify({'mensaje': 'Usuario no encontrado'}), 404
 
@@ -23,13 +23,13 @@ def obtener_usuario(id):
 def crear_usuario():
     contenido = request.json
 
-    # Verificar si el ID ya existe
+    # Verificar si el nombre de usuario ya existe
     for usuario in usuarios:
-        if usuario['id'] == contenido['id']:
-            return jsonify({'error': 'El ID ya existe'}), 400
+        if usuario['username'] == contenido['username']:
+            return jsonify({'error': 'El nombre de usuario ya existe'}), 400
 
     nuevo_usuario = {
-        'id': contenido['id'],
+        'id': len(usuarios) + 1,
         'FirstName': contenido['FirstName'],
         'LastName': contenido['LastName'],
         'username': contenido['username'],
@@ -44,14 +44,13 @@ def crear_usuario():
     return jsonify(nuevo_usuario), 201
 
 # Ruta para actualizar un usuario existente
-@app.route('/api/usuarios/<int:id>', methods=['PUT'])
-def actualizar_usuario(id):
+@app.route('/api/usuarios/<string:username>', methods=['PUT'])
+def actualizar_usuario(username):
     contenido = request.json
     for usuario in usuarios:
-        if usuario['id'] == id:
+        if usuario['username'] == username:
             usuario['FirstName'] = contenido['FirstName']
             usuario['LastName'] = contenido['LastName']
-            usuario['username'] = contenido['username']
             usuario['email'] = contenido['email']
             usuario['address'] = contenido['address']
             usuario['phone'] = contenido['phone']
@@ -62,10 +61,10 @@ def actualizar_usuario(id):
     return jsonify({'mensaje': 'Usuario no encontrado'}), 404
 
 # Ruta para eliminar un usuario existente
-@app.route('/api/usuarios/<int:id>', methods=['DELETE'])
-def eliminar_usuario(id):
+@app.route('/api/usuarios/<string:username>', methods=['DELETE'])
+def eliminar_usuario(username):
     for usuario in usuarios:
-        if usuario['id'] == id:
+        if usuario['username'] == username:
             usuarios.remove(usuario)
             guardar_datos_en_archivo()
             return jsonify({'mensaje': 'Usuario eliminado correctamente'})
