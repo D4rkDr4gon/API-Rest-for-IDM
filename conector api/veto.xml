@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?><driver-configuration config-type="ScriptPolicyImpl" dn="cn=postman,cn=Driver Set,o=null" driver-set-dn="cn=Driver Set,o=null" name="veto">
+	<children>
+		<rule name="veto">
+			<policy>
+				<rule>
+					<description>Set API-Operation = Insert</description>
+					<conditions>
+						<and>
+							<if-op-attr mode="nocase" name="APITest" op="changing-to">TRUE</if-op-attr>
+						</and>
+					</conditions>
+					<actions>
+						<do-set-op-property name="API-Operation">
+							<arg-string>
+								<token-text xml:space="preserve">Insert</token-text>
+							</arg-string>
+						</do-set-op-property>
+						<do-break/>
+					</actions>
+				</rule>
+				<rule>
+					<description>Set API-Operation = Modify</description>
+					<conditions>
+						<or>
+							<if-op-attr name="Surname" op="changing"/>
+							<if-op-attr name="Given Name" op="changing"/>
+						</or>
+						<or>
+							<if-op-attr mode="nocase" name="APITest" op="equal">TRUE</if-op-attr>
+						</or>
+					</conditions>
+					<actions>
+						<do-set-op-property name="API-Operation">
+							<arg-string>
+								<token-text xml:space="preserve">Modify</token-text>
+							</arg-string>
+						</do-set-op-property>
+						<do-break/>
+					</actions>
+				</rule>
+				<rule>
+					<description>Set API_Operation = Reconciliate</description>
+					<conditions>
+						<and>
+							<if-op-property mode="nocase" name="source" op="equal">reconciliacion</if-op-property>
+						</and>
+					</conditions>
+					<actions>
+						<do-set-op-property name="API-Operation">
+							<arg-string>
+								<token-text xml:space="preserve">Reconciliate</token-text>
+							</arg-string>
+						</do-set-op-property>
+						<do-break/>
+					</actions>
+				</rule>
+				<rule>
+					<description>Set API_Operation = Remove</description>
+					<conditions>
+						<and>
+							<if-op-attr mode="nocase" name="Login Disabled" op="equal">TRUE</if-op-attr>
+						</and>
+					</conditions>
+					<actions>
+						<do-set-op-property name="API_Operation">
+							<arg-string>
+								<token-text xml:space="preserve">Remove</token-text>
+							</arg-string>
+						</do-set-op-property>
+						<do-break/>
+					</actions>
+				</rule>
+				<rule disabled="true">
+					<description>Veto</description>
+					<conditions/>
+					<actions>
+						<do-veto/>
+					</actions>
+				</rule>
+			</policy>
+		</rule>
+	</children>
+</driver-configuration>

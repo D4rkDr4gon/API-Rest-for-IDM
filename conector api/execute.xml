@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?><driver-configuration config-type="ScriptPolicyImpl" dn="cn=postman,cn=Driver Set,o=null" driver-set-dn="cn=Driver Set,o=null" name="execute">
+	<children>
+		<rule name="execute">
+			<policy>
+				<rule>
+					<description>API Carga Usuario</description>
+					<conditions>
+						<or>
+							<if-op-property mode="case" name="API-Operation" op="equal">Insert</if-op-property>
+							<if-op-property mode="nocase" name="API-Operation" op="equal">Modify</if-op-property>
+						</or>
+					</conditions>
+					<actions>
+						<do-set-local-variable name="API-cn" scope="policy">
+							<arg-string>
+								<token-src-attr name="CN"/>
+							</arg-string>
+						</do-set-local-variable>
+						<do-set-local-variable name="API-FirstName" scope="policy">
+							<arg-string>
+								<token-src-attr name="Given Name"/>
+							</arg-string>
+						</do-set-local-variable>
+						<do-set-local-variable name="API-LastName" scope="policy">
+							<arg-string>
+								<token-src-attr name="Surname"/>
+							</arg-string>
+						</do-set-local-variable>
+					</actions>
+				</rule>
+				<rule>
+					<description>API Template Body Insert-Modify</description>
+					<conditions>
+						<or>
+							<if-op-property mode="nocase" name="API-Operation" op="equal">Insert</if-op-property>
+							<if-op-property mode="nocase" name="API-Operation" op="equal">Modify</if-op-property>
+						</or>
+					</conditions>
+					<actions>
+						<do-set-local-variable name="API-Template" scope="policy">
+							<arg-string>
+								<token-text xml:space="preserve">{"id": "</token-text>
+								<token-local-variable name="API-cn"/>
+								<token-text xml:space="preserve">", "contenido" :  {</token-text>
+								<token-text xml:space="preserve">"First Name" : "</token-text>
+								<token-local-variable name="API-FirstName"/>
+								<token-text xml:space="preserve">" , "Last Name" : "</token-text>
+								<token-local-variable name="API-LastName"/>
+								<token-text xml:space="preserve">" }}</token-text>
+							</arg-string>
+						</do-set-local-variable>
+					</actions>
+				</rule>
+				<rule>
+					<description>API Ejecutar Insert</description>
+					<comment xml:space="preserve">Se valida que los parametros esten completos</comment>
+					<conditions>
+						<and>
+							<if-op-property mode="nocase" name="API-Operation" op="equal">Insert</if-op-property>
+						</and>
+					</conditions>
+					<actions>
+						<do-append-xml-element expression=".." name="driver-operation-data"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="class-name">
+							<arg-string>
+								<token-text xml:space="preserve">adduser</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="command">
+							<arg-string>
+								<token-text xml:space="preserve">Add</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]" name="request"/>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="header"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]/request[last()]/header" name="content-type">
+							<arg-string>
+								<token-text xml:space="preserve">application/json</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="value"/>
+						<do-append-xml-text expression="../driver-operation-data[last()]/request[last()]/value[last()]">
+							<arg-string>
+								<token-local-variable name="API-Template"/>
+							</arg-string>
+						</do-append-xml-text>
+						<do-strip-xpath disabled="true" expression="$current-op"/>
+						<do-break/>
+					</actions>
+				</rule>
+				<rule>
+					<description>API Ejecutar Modify</description>
+					<comment xml:space="preserve">Se valida que los parametros esten completos</comment>
+					<conditions>
+						<and>
+							<if-op-property mode="nocase" name="API-Operation" op="equal">Modify</if-op-property>
+						</and>
+					</conditions>
+					<actions>
+						<do-append-xml-element expression=".." name="driver-operation-data"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="class-name">
+							<arg-string>
+								<token-text xml:space="preserve">modifyuser</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="command">
+							<arg-string>
+								<token-text xml:space="preserve">Modify</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]" name="request"/>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="url-token"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]/request[last()]/url-token" name="association">
+							<arg-string>
+								<token-src-attr name="CN"/>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="header"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]/request[last()]/header" name="content-type">
+							<arg-string>
+								<token-text xml:space="preserve">application/json</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="value"/>
+						<do-append-xml-text expression="../driver-operation-data[last()]/request[last()]/value[last()]">
+							<arg-string>
+								<token-local-variable name="API-Template"/>
+							</arg-string>
+						</do-append-xml-text>
+						<do-strip-xpath disabled="true" expression="$current-op"/>
+						<do-break/>
+					</actions>
+				</rule>
+				<rule>
+					<description>API Ejecutar Reconciliación</description>
+					<conditions>
+						<and>
+							<if-op-property mode="nocase" name="API-Operation" op="equal">Reconciliate</if-op-property>
+						</and>
+					</conditions>
+					<actions>
+						<do-append-xml-element expression=".." name="driver-operation-data"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="class-name">
+							<arg-string>
+								<token-text xml:space="preserve">queryallusers</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="command">
+							<arg-string>
+								<token-text xml:space="preserve">query</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]" name="request"/>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="url-token"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]/request[last()]/url-token" name="association">
+							<arg-string>
+								<token-text xml:space="preserve">/api/datos</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="header"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]/request[last()]/header" name="content-type">
+							<arg-string>
+								<token-text xml:space="preserve">application/json</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="value"/>
+						<do-append-xml-text expression="../driver-operation-data[last()]/request[last()]/value[last()]">
+							<arg-string>
+								<token-text xml:space="preserve">search</token-text>
+							</arg-string>
+						</do-append-xml-text>
+						<do-strip-xpath disabled="true" expression="$current-op"/>
+						<do-break/>
+					</actions>
+				</rule>
+				<rule>
+					<description>API Ejecutar Remove</description>
+					<comment xml:space="preserve">Se valida que los parametros esten completos</comment>
+					<conditions>
+						<and>
+							<if-op-property mode="nocase" name="API-Operation" op="equal">Remove</if-op-property>
+						</and>
+					</conditions>
+					<actions>
+						<do-append-xml-element expression=".." name="driver-operation-data"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="class-name">
+							<arg-string>
+								<token-text xml:space="preserve">removeuser</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-set-xml-attr expression="../driver-operation-data[last()]" name="command">
+							<arg-string>
+								<token-text xml:space="preserve">delete</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]" name="request"/>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="url-token"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]/request[last()]/url-token" name="association">
+							<arg-string>
+								<token-src-attr name="CN"/>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="header"/>
+						<do-set-xml-attr expression="../driver-operation-data[last()]/request[last()]/header" name="content-type">
+							<arg-string>
+								<token-text xml:space="preserve">application/json</token-text>
+							</arg-string>
+						</do-set-xml-attr>
+						<do-append-xml-element expression="../driver-operation-data[last()]/request[last()]" name="value"/>
+						<do-append-xml-text disabled="true" expression="../driver-operation-data[last()]/request[last()]/value[last()]">
+							<arg-string>
+								<token-local-variable name="API-Body-Modify"/>
+							</arg-string>
+						</do-append-xml-text>
+						<do-strip-xpath expression="$current-op"/>
+						<do-break/>
+					</actions>
+				</rule>
+			</policy>
+		</rule>
+	</children>
+</driver-configuration>

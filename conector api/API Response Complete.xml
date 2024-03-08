@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE policy PUBLIC "policy-builder-dtd" "C:\netiq\idm\apps\Designer\plugins\com.novell.idm.policybuilder_4.0.0.201910221727\DTD\dirxmlscript4.8.dtd"><policy>
+	<rule>
+		<description>Extract data from JSON</description>
+		<conditions>
+			<and>
+				<if-xpath op="true">string-length(self::status/driver-operation-data/response/value/text())>0</if-xpath>
+			</and>
+		</conditions>
+		<actions>
+			<do-set-local-variable name="textInput" scope="policy">
+				<arg-string>
+					<token-replace-all regex="  " replace-with="">
+						<token-xpath expression="self::status/driver-operation-data[1]/response/value/text()"/>
+					</token-replace-all>
+				</arg-string>
+			</do-set-local-variable>
+			<do-set-local-variable name="usersNS" scope="policy">
+				<arg-node-set>
+					<token-split delimiter="\},\{">
+						<token-xpath expression="string($textInput)"/>
+					</token-split>
+				</arg-node-set>
+			</do-set-local-variable>
+			<do-set-local-variable name="count1" scope="policy">
+				<arg-string>
+					<token-text xml:space="preserve">0</token-text>
+				</arg-string>
+			</do-set-local-variable>
+			<do-for-each>
+				<arg-node-set>
+					<token-local-variable name="usersNS"/>
+				</arg-node-set>
+				<arg-actions>
+					<do-set-local-variable name="count1" scope="policy">
+						<arg-string>
+							<token-xpath expression="string(number($count1)+1)"/>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable disabled="true" name="users" scope="policy">
+						<arg-string>
+							<token-xpath expression="$usersNS[$count1]"/>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="users" scope="policy">
+						<arg-string>
+							<token-local-variable name="current-node"/>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="APIid" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+ "|".*' replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="FullName" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+ "|".*' replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="APIcn" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+ "|".*' replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="email" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+ "|".*' replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="userAdress" scope="policy">
+						<arg-string>
+							<token-replace-all regex=".+\{|\}.+" replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressAtributes" scope="policy">
+						<arg-node-set>
+							<token-split delimiter=",">
+								<token-local-variable name="userAdress"/>
+							</token-split>
+						</arg-node-set>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressStreet" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$AdressAtributes[1]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressSuite" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$AdressAtributes[2]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressCity" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$AdressAtributes[3]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="Adresszipcode" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$AdressAtributes[4]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressGeo" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$AdressAtributes[5]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressGeoAtributes" scope="policy">
+						<arg-node-set>
+							<token-split delimiter=",">
+								<token-local-variable name="AdressGeo"/>
+							</token-split>
+						</arg-node-set>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressGeoLat" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$AdressGeoAtributes[1]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="AdressGeoLng" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$AdressGeoAtributes[2]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="phone" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+ "|".*' replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="website" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+ "|".*' replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="userCompany" scope="policy">
+						<arg-string>
+							<token-replace-all regex=".+\{|\}.+" replace-with="">
+								<token-local-variable name="users"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="CompanyAtributes" scope="policy">
+						<arg-node-set>
+							<token-split delimiter=",">
+								<token-local-variable name="userCompany"/>
+							</token-split>
+						</arg-node-set>
+					</do-set-local-variable>
+					<do-set-local-variable name="CompanyName" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$CompanyAtributes[1]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="CompanyCatchPhrase" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$CompanyAtributes[2]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="CompanyBs" scope="policy">
+						<arg-string>
+							<token-replace-all regex='.+: "|".*' replace-with="">
+								<token-xpath expression="$CompanyAtributes[3]"/>
+							</token-replace-all>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="userDN" scope="policy">
+						<arg-string>
+							<token-text xml:space="preserve">\IDM01_TREE\system\users\</token-text>
+							<token-local-variable name="APIcn"/>
+						</arg-string>
+					</do-set-local-variable>
+					<do-set-local-variable name="userExist" scope="policy">
+						<arg-string>
+							<token-dest-attr name="uniqueID">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+							</token-dest-attr>
+						</arg-string>
+					</do-set-local-variable>
+					<do-if>
+						<arg-conditions>
+							<and>
+								<if-local-variable mode="regex" name="userExist" op="not-equal">.+</if-local-variable>
+							</and>
+						</arg-conditions>
+						<arg-actions>
+							<do-add-dest-object class-name="User" direct="true">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+							</do-add-dest-object>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Object Class">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-text xml:space="preserve">Top</token-text>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="CN">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="APIcn"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="CN">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="APIcn"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Full Name">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="FullName"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="EMail Address">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="email"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Adress.Street">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="AdressStreet"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Adress.Suite">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="AdressSuite"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Adress.City">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="AdressCity"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Adress.Zipcode">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="Adresszipcode"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Adress.Geo.Lat">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="AdressGeoLat"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Adress.Geo.lng">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="AdressGeoLng"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Telephone Number">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="phone"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="website">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="website"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Company.Name">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="CompanyName"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Company.catchPhrase">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="CompanyCatchPhrase"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-add-dest-attr-value class-name="User" direct="true" name="Company.bs">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-local-variable name="CompanyBs"/>
+								</arg-value>
+							</do-add-dest-attr-value>
+							<do-set-dest-attr-value class-name="User" direct="true" name="APITest">
+								<arg-dn>
+									<token-local-variable name="userDN"/>
+								</arg-dn>
+								<arg-value type="string">
+									<token-text xml:space="preserve">TRUE</token-text>
+								</arg-value>
+							</do-set-dest-attr-value>
+						</arg-actions>
+						<arg-actions/>
+					</do-if>
+				</arg-actions>
+			</do-for-each>
+		</actions>
+	</rule>
+</policy>
